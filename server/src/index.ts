@@ -6,10 +6,17 @@ import { t } from "./utils/template.js";
 
 const PORT: number = 3003;
 
+let requestsCount  = 0
+
 const app = http.createServer(async (req, res) => {
-  if (req.url === "/favicon.ico") {
-    return;
+  requestsCount++
+
+
+  if(req.url === '/count'){
+    res.end(String(requestsCount));
+    return
   }
+
 
   // if(req.url === '/user'){
   //   let data = "";

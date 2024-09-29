@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Home</title>
+</head>
+<body>
+
+    <h1>{header}</h1>
+
+
+
+    <form id="form" action="user" method="post">
+        <p>
+            <label>Имя:</label><br>
+            <input name="username" />
+        </p>
+        <p>
+            <label>Возраст:</label><br>
+            <input name="userage" type="number" />
+        </p>
+        <button type="submit" >Отправить</button>
+    </form>
+
+    
+
+    <script>
+
+        async function submitForm(form){
+            try {
+                const response = await fetch('/user', {
+                method: 'post',
+                body: JSON.stringify(Object.fromEntries(new FormData(form).entries())),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+
+                const data = await response.json()
+                console.log(data);
+            } 
+            catch (error) {
+                console.log(error);
+            }
+            
+        }
+
+        document.querySelector('#form').addEventListener('submit', async(e) => {
+
+            e.preventDefault();
+
+            if(e.target.username.value === '' || e.target.userage.value === ''){
+                alert('Заполните все поля');
+                return
+            }
+            await submitForm(e.target);
+            e.target.reset()
+
+
+        })
+
+    </script>
+</body>
+</html>

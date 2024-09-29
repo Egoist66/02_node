@@ -1,0 +1,22 @@
+{
+  "name": "01_node",
+  "version": "1.0.0",
+  "description": "A brief description of my package",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "npx nodemon",
+    "dev": "nodemon  --watch server/src --ext ts --exec \"tsc -p tsconfig.json && node dist/index.js\"",
+    "build": "tsc -p tsconfig.json"
+  },
+  "author": "Farid",
+  "license": "MIT",
+  "dependencies": {
+    "nodemon": "^3.1.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2"
+  }
+}

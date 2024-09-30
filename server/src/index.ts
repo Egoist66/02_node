@@ -3,8 +3,9 @@ import { __DIR__ } from "./constants/constants.js";
 import fs from "fs";
 import path from "path";
 import { t } from "./utils/template.js";
+import { delay } from "./utils/delay.js";
 
-const PORT: number = 3003;
+const __PORT__: number = 3003;
 
 let requestsCount  = 0
 
@@ -13,9 +14,29 @@ const app = http.createServer(async (req, res) => {
 
 
   if(req.url === '/count'){
-    res.end(String(requestsCount));
+    res.writeHead(200, {
+      "Content-Type": "text/html",
+      "content-encoding": "utf-8"
+    })
+    res.write(`<link rel="icon" href="data:,">`)
+
+
+    /* const start = new Date()
+
+    while(+new Date() - +start < 5000){
+      console.log(+new Date() - +start)
+    }*/
+
+
+
+  
+    await delay(5000)
+
+    res.write(String(`<h2>${requestsCount}</h2>`));
+    res.end()
     return
   }
+
 
 
   // if(req.url === '/user'){
@@ -41,13 +62,13 @@ const app = http.createServer(async (req, res) => {
     }
 
     const data = JSON.parse(Buffer.concat(buffers).toString());
-    console.log(data);
+    //console.log(data);
     
     res.writeHead(200, { 
       "Content-Type": "application/json", 
       "content-encoding": "utf-8"
     });
-    
+
     res.end(JSON.stringify({data, ok: true}));
 
     return
@@ -83,10 +104,11 @@ const app = http.createServer(async (req, res) => {
     return;
   }
 
-  fs.readFile(filePath, "utf8", (err, data) => {
+  fs.readFile(filePath, "utf8", async (err, data) => {
     if (err) {
       res.statusCode = 500;
       res.end("Internal Server Error");
+
     } else {
       const title = `Hello ${req.url}`;
 
@@ -101,6 +123,6 @@ const app = http.createServer(async (req, res) => {
   });
 });
 
-app.listen(PORT, async () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(__PORT__, async () => {
+  console.log(`Server running on http://localhost:${__PORT__}`);
 });

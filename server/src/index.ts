@@ -4,22 +4,53 @@ import fs from "fs";
 import path from "path";
 import { t } from "./utils/template.js";
 import { delay } from "./utils/delay.js";
+import { getOsData } from "./utils/os-info.js";
+import os from "node:os";
+import { checkType } from "./utils/check-type.js";
+import { postData } from "./utils/postData.js";
 
 const __PORT__: number = 3003;
 
-let requestsCount  = 0
+let requestsCount = 0;
 
 const app = http.createServer(async (req, res) => {
-  requestsCount++
+  requestsCount++;
 
+  if (req.url === "/user" && req.method === "POST") {
+    const data = postData(req);
 
-  if(req.url === '/count'){
+    res.writeHead(200, {
+      "Content-Type": "application/json",
+      "content-encoding": "utf-8",
+    });
+
+    res.end(
+      JSON.stringify({
+        data,
+        ok: true,
+        os: getOsData(os),
+        checkTypeFn: checkType.toString(),
+      })
+    );
+
+    return;
+  }
+
+  if (req.url === "/user" && req.method === "GET") {
+    res.writeHead(405, {
+      "Content-Type": "text/html",
+      "content-encoding": "utf-8",
+    });
+    res.end("Method not allowed - " + req?.method);
+    return;
+  }
+
+  if (req.url === "/count") {
     res.writeHead(200, {
       "Content-Type": "text/html",
-      "content-encoding": "utf-8"
-    })
-    res.write(`<link rel="icon" href="data:,">`)
-
+      "content-encoding": "utf-8",
+    });
+    res.write(`<link rel="icon" href="data:,">`);
 
     /* const start = new Date()
 
@@ -27,17 +58,12 @@ const app = http.createServer(async (req, res) => {
       console.log(+new Date() - +start)
     }*/
 
+    await delay(1000);
 
-
-  
-    await delay(5000)
-
-    res.write(String(`<h2>${requestsCount}</h2>`));
-    res.end()
-    return
+    res.write(`<h2>${requestsCount}</h2>`);
+    res.end();
+    return;
   }
-
-
 
   // if(req.url === '/user'){
   //   let data = "";
@@ -51,31 +77,6 @@ const app = http.createServer(async (req, res) => {
 
   //   return
   // }
-
-
-  if (req.url === "/user") {
-         
-    const buffers = []; // буфер для получаемых данных
-
-    for await (const chunk of req) {
-      buffers.push(chunk);        // добавляем в буфер все полученные данные
-    }
-
-    const data = JSON.parse(Buffer.concat(buffers).toString());
-    //console.log(data);
-    
-    res.writeHead(200, { 
-      "Content-Type": "application/json", 
-      "content-encoding": "utf-8"
-    });
-
-    res.end(JSON.stringify({data, ok: true}));
-
-    return
-  }
-
-
-
 
   const filePath = path.normalize(
     path.join(
@@ -108,16 +109,14 @@ const app = http.createServer(async (req, res) => {
     if (err) {
       res.statusCode = 500;
       res.end("Internal Server Error");
-
     } else {
       const title = `Hello ${req.url}`;
 
       res.writeHead(200, { "Content-Type": contentType });
 
-
       const text = `${
-      t(data, /{header}/, title)()
-      .t(/{footer}/, "Footer").value}`;
+        t(data, /{header}/, title)().t(/{footer}/, "Footer").value
+      }`;
       res.end(text);
     }
   });
